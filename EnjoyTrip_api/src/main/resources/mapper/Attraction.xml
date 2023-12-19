@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.attraction.model.dao.AttractionDao">
+	<select id="searchAttraction" resultType="AttractionDto">
+		select ai.content_id, ai.content_type_id, ai.title, ai.addr1, ai.addr2, ai.first_image, ai.sido_code, ai.gugun_code, ai.latitude, ai.longitude, COALESCE(COUNT(f.user_id), 0) AS favor_cnt
+		from attraction_info ai LEFT JOIN favorite f 
+		on ai.content_id = f.content_id
+		<trim prefix="where" suffixOverrides="and">
+			<if test="sido_code != 0">
+				sido_code = #{sido_code} and
+			</if>
+			<if test="gugun_code != 0">
+				gugun_code = #{gugun_code} and
+			</if>
+			<if test="content_type_id != 0">
+				content_type_id = #{content_type_id} and
+			</if>
+			<if test="title != null">
+				title like concat('%',#{title},'%')
+			</if>
+		</trim>
+		group by content_id
+	</select>
+	
+	<select id="getSidoList" resultType="SidoDto">
+		select *
+		from sido;
+	</select>
+	
+	<select id="getGugunList" resultType="GugunDto">
+		select *
+		from gugun
+		where sido_code = #{sidoCode}
+	</select>
+	
+	<select id="getContentTypeList" resultType="contentDto">
+		select *
+		from contents
+	</select>
+	
+	<select id="getAttraction" resultType="AttractionDto">
+		select ai.content_id, ai.content_type_id, ai.title, ai.addr1, ai.addr2, ai.first_image, ai.sido_code, ai.gugun_code, ai.latitude, ai.longitude, COALESCE(COUNT(f.user_id), 0) AS favor_cnt
+		from attraction_info ai LEFT JOIN favorite f 
+		on ai.content_id = f.content_id
+		where ai.content_id = #{contentId}
+		group by ai.content_id
+	</select>
+	
+	<select id="getBestAttractions" resultType="AttractionDto">
+		select ai.content_id, ai.content_type_id, ai.title, ai.addr1, ai.addr2, ai.first_image, ai.sido_code, ai.gugun_code, ai.latitude, ai.longitude, COALESCE(COUNT(f.user_id), 0) AS favor_cnt
+		from attraction_info ai LEFT JOIN favorite f 
+		on ai.content_id = f.content_id
+		where f.user_id is not null
+		group by ai.content_id
+		order by favor_cnt desc, content_id asc
+		limit 10
+	</select>
+</mapper> 

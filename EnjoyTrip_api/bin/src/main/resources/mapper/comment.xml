@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.board.model.dao.CommentDao">
+
+    <resultMap type="commentDto" id="comment">
+        <result column="comment_id" property="commentNo"/>
+        <result column="article_no" property="articleNo"/>
+        <result column="content" property="content"/>
+        <result column="register_time" property="registerTime"/>
+        <result column="user_id" property="userId"/>
+    </resultMap>
+
+    <insert id="writeComment">
+        insert into comments(article_no, content, register_time, user_id)
+        values (#{articleNo}, #{content}, now(), #{userId})
+        <selectKey resultType="int" keyProperty="commentNo" order="AFTER">
+            select last_insert_id()
+        </selectKey>
+    </insert>
+
+    <delete id="deleteComment" parameterType="int">
+        delete from comments
+        where comment_id = #{commentNo}
+    </delete>
+
+<!--    <delete id="modifyComment">-->
+<!--        update comments-->
+<!--        set content = #{content}-->
+<!--        where comment_id = #{commentNo}-->
+<!--    </delete>-->
+
+    <select id="listComments" parameterType="map" resultMap="comment">
+        select distinct c.comment_id, c.article_no, c.content, c.register_time, c.user_id
+        from board b, comments c
+        where #{articleNo} = c.article_no
+        order by c.comment_id
+        limit #{start}, #{listsize}
+    </select>
+
+    <select id="getTotalCommentCount" parameterType="int" resultType="int">
+        select count(comment_id)
+        from comments c
+        where #{articleNo} = c.article_no
+
+    </select>
+
+</mapper>

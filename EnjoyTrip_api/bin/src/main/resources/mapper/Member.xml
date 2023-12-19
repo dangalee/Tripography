@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.ssafy.member.model.dao.MemberDao">
+	
+	<resultMap type="MemberDto" id="member">
+		<result column="user_id" property="userId"/>
+		<result column="user_pw" property="userPw"/>
+		<result column="salt" property="salt"/>
+		<result column="user_name" property="userName"/>
+		<result column="user_email" property="userEmail"/>
+		<result column="user_grade" property="userGrade"/>
+		<result column="join_date" property="joinDate"/>
+	</resultMap>
+
+	<insert id="insert">
+		insert into member(user_id, user_pw, salt, user_name, user_email, user_grade, join_date)
+		values (#{userId},#{userPw}, #{salt}, #{userName}, #{userEmail}, #{userGrade}, #{joinDate})
+	</insert>
+	
+	<update id="update">
+		update member
+		set user_pw = #{userPw}, 
+		    salt = #{salt},
+		    user_name = #{userName},
+		    user_email = #{userEmail},
+		    user_grade = #{userGrade},
+		    join_date = #{joinDate}
+		where user_id = #{user_pw}
+	</update>
+	
+	<delete id="delete">
+		delete from member
+		where user_id = #{userId}
+	</delete>
+	
+	<select id="select" resultMap="member">
+		select *
+		from member
+		where user_id = #{userId}
+	</select>
+	
+	<select id="selectAll" resultMap="member">
+		select * from member
+	</select>
+	
+	<select id="login" resultMap="member">
+		select *
+		from member
+		where user_id = #{userId} and user_pw = #{userPw} 
+	</select>
+
+</mapper>
